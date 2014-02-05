@@ -1,0 +1,98 @@
+- Tokens don't have branching (e.g. <|>)
+- can have token "literls", e.g. using the parsing API we can do:
+    -> hex = symbol("0") ->> oneOf("xX") ->> digit*
+- want to capture values
+    -> digit* should return the string of digits it parses
+- user and lib error messages, need line and column info
+    -> use while loop instead of "for x in iter" so we can backtrack
+- start simple, by parsing just decimals and additions
+- Token, Lexer, Parser
+- Token fns - oneOf, inRange, not (!)
+- Parse fns - option/maybe (?), many (*), many1 (+)
+- Success, Failure, Error
+
+- Token: list of accepting states? ADT for types of accepting states
+  (range vs list)
+- Separate what goes in parser and what goes in Lex/Token
+- Token should be a single char
+    -> for now, to make it easier
+
+- What is a token?
+- ADTs
+- Tokens are a chain of accepting states
+- We get a char of input. What next?
+- Lexer is DFA with chars -> tokens, Parser is DFA with tokens -> AST
+- Rounds: first round, get rid of tokens that don't match first char.
+  Second round get rid of tokens that don't continue to match with second
+  input char, and so on
+- Token type should not be an ADT?
+- matchAndConsume, then filter on those that matched
+    -> repeat until in terminal state and next char doesn't match
+- Have reserved keywords be tokens?
+    -> No
+- Comments
+- parse :: FilePath -> AST
+- Consume: function that returns a function
+    -> like the that Go lib
+- Difference between tokens vs token directives
+    -> token::Plus vs the function used to define the token (e.g.
+       symbol("+"), or lit_char('+'))
+- Is Tokenizing/Lexing ambiguous? i.e. can the same input tokenize as 2
+  different tokens? Like, is this a case that will come up?
+    -> I don't think it is
+- Have to keep state
+    -> When tokenizing an identifier, need to return the entire string
+       identifier
+    -> So token objects need a payload/str field
+- The list of Tokens that we give to the tokenizer have type <T: Token>
+    -> i.e. they implement the Token interface
+- Think typeclasses
+- Tokenizer/Lexer has function called Tokenize/Lex that takes in a list (?)
+  of elements of type <T: Token>
+    -> or maybe returns such a list?
+- Token can contain its parsing directive
+- How do we make the API simple? What would we like to do, and how would we
+  like to do it?
+    -> Do this (skeleton code)
+- Token creators are symbol("c"), digit.+(), etc
+    -> they return Tokens
+- Tokens could be type parameterized with a user Token type
+- Have to map token directive to user token type(s)
+- Could map TD to fn: ~str -> <T>, where T is user token type
+- LexCmd = TokenDirective
+- for _ in enum { try to match, get list of matching tokens (filter), and
+  try to continue to match }
+- Implement a trait for you token type
+    -> Want the other way around though (don't want MyTokenType to map to
+       LexCmds, want LexCmds to map to Tokens)
+    -> We are trying to contruct tokens
+- In parser user code, need to be able to specify strings
+    -> e.g. ident("if")
+- Maybe do ident(Option<~str>)?
+    -> No, there should be a better way
+    -> Want behvior completely user defined
+- Issue: how does the user use their tokens in the parsing API?
+    -> Problem with constructors: The user wants to specify ident, not
+       ident(str)
+    -> maybe ident shouldn't be a token?
+    -> How do we use tokens with constructors in the Parse API?
+- Maybe Tokens shouldn't have constructors, but should be instead be a field
+  in a struct, with payload another field in the stuct
+    ->  stuct Token<T> {
+            type: T; // This is the user token type
+            payload: ~str;
+        }
+    -> makeToken<T>(myToken: T) -> Token<T>
+        -> Or just have a constructor for Token (Token<T>::new(MyToken))
+    -> This is more flexible
+- Use the std::ops traits to overwrite +,-,!, etc.
+- DFA should be a (generic) trait, and LexCmd should implement that trait
+    -> User should see LexCmd in the API instead of DFA
+- Lexer will take a list of tokens, extract all the lexcmds and make one big
+  lexcmd (?)
+- For LexCmds, implement the SHL trait (>>), so that we can chain lexCmds
+  like: hex = symbol("0") >> oneOf(["X", "x"]) >> many1(digit)
+- Can also implement the ! trait for negation of a LexCmd (useful for oneOf)
+- Tokens are what the Lexer should be giving the user
+    -> Input to the Lexer is (map: LexCmd -> <T>)
+    -> Output is Token<T>
