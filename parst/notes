@@ -96,3 +96,23 @@
 - Tokens are what the Lexer should be giving the user
     -> Input to the Lexer is (map: LexCmd -> <T>)
     -> Output is Token<T>
+- Should lexCmds/DFAs return str or Tokens?
+    -> lexCmd return Tokens, DFAs return str?
+- LexGraph is internal representation
+- LexCmd: fn (input: str/char) -> (<T>) -> LexGraph
+- No backtracking for now
+- Think about symbol('a') >> symbol('b')
+- 'a', 'b' -> symbol('a') >> symbol('b') => LexCmd { val: "ab", done: true,
+  accepts(any) => false }
+- LexCmds can be a linked list
+    -> which can be "implemented" by the consume function
+- >> has to be aware of what types of LexCmds it is joining
+    -> the accept and consume functions of each type should be easily
+       accessible/useable
+- instead of consume returning a new ~LexCmd, it could just modify val, done,
+  etc.
+    -> But what about chaining? Returning a ~LexCmd makes chaining easier
+       (if not possible in the first place)
+    -> Look into it
+- consume can use get_next
+- Parser combinator
