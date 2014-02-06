@@ -116,3 +116,13 @@
     -> Look into it
 - consume can use get_next
 - Parser combinator
+- When calling get next, we set val of next to the built-up string so far
+- should start skeleton coding
+- Need to implement send for Token<T>
+    -> Use channels eventually, for now just return a list of tokens
+- Need a way to couple LexCmd terminal state(s) with user Tokens
+    -> but still be able to combine LexCmds without reference to Tokens
+    -> i.e. symbol('0') >> symbol('x')
+- Maybe instead of (>>) we can just input LexCmds as a list?
+    -> many and many1 can still be wrappers (as they don't join)
+    -> I think solving the LexCmd/Token coupling issue is important tho

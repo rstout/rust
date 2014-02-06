@@ -14,6 +14,7 @@ struct Token<T> {
 struct LexCmd {
     val: ~str,
     done: bool,
+    failed: bool,
     accepts: fn(char) -> bool,
     // Can implement many and many1 here: if self.accepts, return self with
     // updated val, else return next LexCmd in the chain
