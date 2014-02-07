@@ -126,3 +126,30 @@
 - Maybe instead of (>>) we can just input LexCmds as a list?
     -> many and many1 can still be wrappers (as they don't join)
     -> I think solving the LexCmd/Token coupling issue is important tho
+- Want to be able to COMPOSE LexCmds
+    -> (>>) is our composition operator
+- Let's first design the symbol() LexCmd, and then do (>>) for them
+    -> Need to keep arch design in mind
+- Might want to develop a good DFA API
+    -> Can be used by both the Lexer and Parser libs
+- LexCmds should only be wrappers around the type of function (symbol, many1,
+  etc.) and the input to that function. Combined with the User token type,
+  this user arg can be turned into a DFA
+- DFA will be type parameterized, but we want to give it a stream of chars
+  and want to get a Token<T> back
+- DFA has nodes, does/not accept, transitions, terminal states, type of input,
+  type of output
+    -> 2 transition fns: 1 if accepts, 1 if not accepts
+- How to handle failure?
+    -> On every (char) input, we need to check for failure, success, or
+       continuing to make progress
+    -> Maybe DFA could send results on a chan, but if there is failure,
+       DFA could just close the port it's receiving input on
+    -> This would signal to the provider that a failure occured
+    -> We may want to signal soft errors though, in the case where the caller
+       might want to backtrack
+    -> Though backtrack could (should?) be baked into the DFA
+- Is it worth it to write a DFA lib?
+    -> Going to do most of one for LexCmds anyway, should go all the way to
+       reduce work in parser?
+- DFANode
