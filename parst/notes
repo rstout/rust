@@ -153,3 +153,5 @@
     -> Going to do most of one for LexCmds anyway, should go all the way to
        reduce work in parser?
 - DFANode
+- How do we handle multiple modifiers? (e.g. Not and Many combo)
+- Does LexCmd's accepts() fn make LexKind obsolete?
