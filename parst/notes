@@ -155,3 +155,16 @@
 - DFANode
 - How do we handle multiple modifiers? (e.g. Not and Many combo)
 - Does LexCmd's accepts() fn make LexKind obsolete?
+- Make accept based on the kind
+- Modified isn't the most clear
+- Leaning towards a list of LexCmds over using (>>)
+- Should start organizing into user and lib modules
+- Layers:
+    1. User code
+    2. Library code that user interacts with. Must be simple, clear and
+       be easy to understand and use
+    3. Internals
+- In this case, its 1. User Code 2. Lexer 3. DFA
+- Start thinking functionaly/ADT
+- Need to clean up Lexer.rs
+    -> Documentation

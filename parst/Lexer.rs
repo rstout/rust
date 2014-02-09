@@ -1,36 +1,42 @@
-//use std::comm::Chan;
+use token::Token;
 
-fn main() {
-
+enum LexCmd {
+    Symbol(char),
+    OneOf(~[char]),
+    Range(char, char), // Inclusive
+    Modified(LexModifier, ~LexCmd)
 }
 
-enum C0Tokens {
-    Plus,
-    Digit
-}
-
-struct HasClosure<'a> {
-    closure: 'a |int| -> bool
-}
-
-fn new_eq_check<'a>(i: int) -> ~HasClosure<'a> {
-    ~HasClosure { closure: |j| { i == j } }
-}
-
-/*
-fn symbol<'a>(sym: char) -> ~LexCmd<'a> {
-    ~LexCmd {
-        kind: Symbol,
-        accepts: |c| { sym == c },
-        modifier: None
+impl LexCmd {
+    fn accepts(&self, c: char) -> bool {
+        match *self {
+            Symbol(sym) => c == sym,
+            OneOf(ref cs) => cs.contains(&c),
+            Range(low, high) => low <= c && c <= high,
+            Modified(modifier, ref cmd) => cmd.accepts(c)
+        }
     }
 }
 
-// Is this needed? Doesn't having an accepts function make this obsolete?
-enum LexKind {
-    Symbol,
-    OneOf,
-    Range
+pub fn symbol(sym: char) -> ~LexCmd {
+    ~Symbol(sym)
+}
+
+pub fn oneOf(chars: ~[char]) -> ~LexCmd {
+    ~OneOf(chars)
+}
+
+// Inclusive
+pub fn range(low: char, high: char) -> ~LexCmd {
+    ~Range(low, high)
+}
+
+pub fn many(cmd: ~LexCmd) -> ~LexCmd {
+    ~Modified(Many, cmd)
+}
+
+pub fn many1(cmd: ~LexCmd) -> ~LexCmd {
+    ~Modified(Many1, cmd)
 }
 
 // How do we handle multiple modifiers?
@@ -40,47 +46,14 @@ enum LexModifier {
     Not
 }
 
-struct LexCmd<'a> {
-    kind: LexKind,
-    accepts: 'a |char| -> bool, // maybe a closure
-    modifier: Option<LexModifier>
-}
-*/
 
-/*
-// (>>) sets the next field
-struct LexCmd {
-    val: ~str,
-    accepts: fn (char) -> bool,
-    done: bool,
-    // Sets done
-    // If accepts and not done, add to val and return next with the val.
-    // If accepts and done, "return" val
-    // If does not accept, return None (?)
-    consume: fn(char) -> Option<~LexCmd>,
-    next: Option<~LexCmd>
-}
-*/
-
-/*
-// What is "returned" by the Lexer
-struct Token<T> {
-    kind: T,
-    val: ~str
+// Don't want this to be public
+pub struct Lexer<T> {
+    cmds: ~[(~LexCmd, T)]
 }
 
-impl<T> Token<T> {
-    fn new(kind: T, val: ~str) -> ~Token<T> {
-        ~Token { kind: kind, val: val }
-    }
-}
-
-struct Lexer<'a, T> {
-    cmds: ~[(~LexCmd<'a>, T)]
-}
-
-impl<'a, T> Lexer<'a, T> {
-    fn new(cmds: ~[(~LexCmd<'a>, T)]) -> ~Lexer<'a, T> {
+impl<T> Lexer<T> {
+    pub fn new(cmds: ~[(~LexCmd, T)]) -> ~Lexer<T> {
         ~Lexer { cmds: cmds }
     }
 
@@ -90,4 +63,3 @@ impl<'a, T> Lexer<'a, T> {
         ~[]
     }
 }
-*/
