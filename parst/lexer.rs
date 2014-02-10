@@ -43,7 +43,8 @@ pub fn many1(cmd: ~LexCmd) -> ~LexCmd {
 enum LexModifier {
     Many,
     Many1,
-    Not
+    Not,
+    NoAdd // Don't add parsed input to the built-up string
 }
 
 

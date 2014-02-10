@@ -168,3 +168,76 @@
 - Start thinking functionaly/ADT
 - Need to clean up Lexer.rs
     -> Documentation
+- DFA: keep track of consumed input
+    -> DFAs are directed cyclic graphs, where every node has at most 2
+       out-branches (either matches or doesn't)
+    -> terminal states, which return/output a value. You don't immediately
+       end if you end up in a terminal state, though.
+- Let's start with the question: What is a DFA Node?
+- Binary DFA: nodes only have 2 out-branches
+    -> I think is is just DFA, no need to specify "Binary" DFA
+- Maybe just have a bool flag for "is_accept_state"
+- Accept states can still have out-branches
+- Maybe not have a branch for match failure?
+    -> In our case, match failure means only one case?
+    -> But for backtracking, we may need this
+    -> So implement no-match branch
+    -> Can always point all of them to the same node
+- No-match in an accept state is handled differently
+    -> i.e. as success
+- Our built-up string should be kept in the DFA struct, not the Node struct
+- (?) Parameterize Nodes over 2 types: input and struct that holds accept
+  function?
+    -> We have to parameterize over input type, let's hold off on the other
+- DFA holds mut ref to current node, which gets updated
+- When no-match on accept state, need to know how to return a token
+- Could have lexCmd wrapper to not add consumed input to the string
+- Whats the flow?
+    -> We give our DFA a char
+    -> It either updates its state or "returns" a token or failure
+- Make DFA a trait or enum?
+    -> Even abstract it to type parameters?
+    -> Make it abstract so both lexer and parser can use it
+- Build up output, then on no-match on accept state, package it up and send
+  if through a channel
+- I think DFA should be a trait
+- What is the bare minimum needed to specify a DFA and how it should function?
+    -> User needs to give Node graph, Nodes need an accept function
+- What does the start node do?
+- Does Node need public successNode and failNode? Could the accepts function
+  just return the appropriate node?
+    -> Maybe returns Option<Node>, and None indicates failure?
+    -> If DFA gets back Some(), then add input to collection
+    -> Nodes need a way to tell DFA not to add to the collection
+    -> So what is the return type of Node.accepts()?
+    -> If DFA gets None, does that mean we've ended on success or fail?
+        -> Depends whether it's an accept state or not
+- If we're in an accepting state, we'll eventually get kicked out (e.g. we'll
+  hit whitespace)
+    -> So on accept state to non-accept state we stop and that's a token
+    -> accept state to accept state is okay (e.g. "if" -> "ifg", both are
+       valid tokens)
+- Don't have successNode and failNode
+    -> restricts to just 2 out branches/nodes
+    -> instead have a function that takes input (char) and returns
+       Option<Node>
+    -> If we get None, then success if Node is accept Node, fail ow
+    -> If success, need to return token type to construct Token
+- Abstract this all into functions
+- DFA provides an API to be used by the library, not the user
+- DFA is used to say yes or no to a stream of input
+- Longest match
+- Give a char to the DFA. What could we get back?
+    -> Failure
+    -> A Token (success)
+    -> Nothing (still need more input)
+- DFA fn consume(input)
+    -> Iterate over the char stream, continuously consuming, occasionally
+       outputting tokens
+- LexResult: Fail or Token
+- Consume does what with it's input?
+    -> gives it to the accepts fn of the current Node
+- Let's think about DFA and Nodes in the abstract
+- Type of accepting state
+    -> Different types of accepting states (for the different types of tokens)
+- On failure (for some nodes) go back to start node
