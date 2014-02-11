@@ -241,3 +241,28 @@
 - Type of accepting state
     -> Different types of accepting states (for the different types of tokens)
 - On failure (for some nodes) go back to start node
+- DFA should be a generic library that the layer above queries/uses
+    -> e.g. Are we in an accept state?
+    -> What about returning Tokens?
+    -> Allow querying for metadata, e.g. What /type/ of state are we at?
+       i.e. in addition to querying about whether accept state
+    -> In our implementation, all accept states should be marked with a
+       token type (?)
+- So first write DFA/Node impl without Lex/Parse in your head
+    -> Then /add-to/ DFA API so it plays nice with Lex/Parse wants
+- Architecture:
+                                   User
+                                Lexer/Parser
+                     Bridge (between Lexer/Parser and DFA)
+                                    DFA
+- (?) "03" doesn't need to be taken care of in parse/lex phase, could be taken
+  care of in checker?
+- Have a node type that has no outbranches?
+    -> For the generic case
+    -> could be used to tell when we've stopped parsing a single token?
+    -> could contain a token type?
+* Building stuff from the input show be delegated to the level above
+    -> To the Bridge
+    -> The lexer/parser then uses the Bridge/DFA API
+- DFA as an API
+    -> behind an interface

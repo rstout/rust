@@ -3,6 +3,40 @@
 
 fn main() {}
 
+
+struct DFA<T> {
+    consume: fn(T)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 // This is what we might want for Tokens, but what about in the
 // abstract case?
 enum Result<T> {
@@ -59,3 +93,4 @@ impl Node {
         next
     }
 }
+*/
