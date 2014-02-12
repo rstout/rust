@@ -3,8 +3,9 @@
 
 fn main() {}
 
-
-struct DFA<T> {
+// add functions for querying state
+// make a trait?
+trait DFA<T> {
     consume: fn(T)
 }
 

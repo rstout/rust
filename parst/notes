@@ -266,3 +266,39 @@
     -> The lexer/parser then uses the Bridge/DFA API
 - DFA as an API
     -> behind an interface
+- Separate querying for acceptance and going to next node
+    -> Maybe have return type of accepts() be Option<Node>?
+    -> But don't want to expose Nodes to user/caller
+- Be sure to add good documentation
+- How will the Lexer use the DFA API?
+    -> lexer: new_lexer_dfa();
+    -> Want to input char stream and get out token stream
+- How do we constuct a DFA?
+- Maybe have Nodes execute a function when they stop matching from a terminal
+  state?
+    -> So when we're "done" parsing an ident (e.g. we see a '+'), then we
+       have some way to tell the Node to execute some function
+    -> But we want the built up token to reside at the higher level, i.e.
+       the lexer worries about building the token, not the DFA/Nodes
+- Is there a case where we go from a terminal state to a non terminal state,
+  and then back to a terminal state?
+    -> If not, then a transition from terminal to non-terminal signifies
+       a token parse (or failure?)
+- How do we signal failure?
+    -> The Bridge will worry about this, and will keep DFA construction in
+       mind
+    -> i.e. the way we construct the DFA will allow us to signal failure
+       more easily
+- The Bridge will be the one constructing tokens/AST-things and sending
+  them over the channel
+- The Bridge interface for Lexer and Parser should look the same?
+- In constructing the DFA (i.e. creating Nodes), we can customize
+    -> Add metadata (e.g. token type) to the Node
+- Can't have T -> NT -> T because we construct our tokens (well, the token
+  creation API) s.t. the only terminal state is at the end (i.e. no more
+  input is expected)
+    -> What about many(string("some"))?
+    -> But then "e" to "s" is a match
+- So we'll never have T -> no match -> NT -> T
+- Leverage the fact that we can use the DFA to make Nodes that make sense to
+  us (e.g. failure nodes, or using the start node as some signal)
