@@ -302,3 +302,16 @@
 - So we'll never have T -> no match -> NT -> T
 - Leverage the fact that we can use the DFA to make Nodes that make sense to
   us (e.g. failure nodes, or using the start node as some signal)
+- DFA isn't used to query for a match, it's used to query for the next node,
+  and to query the state of the node
+- Transitioning from a terminal state to the start state could signal
+  that we've parsed a token
+    -> Have to re-input the char that cause the transition to the start node,
+       so that the start node can start to parse it as a token
+- Improve and refine DFA/Node API
+- Step 1: Turn unmodified lexcmds to Nodes
+  Step 2: Turn modified lexcmds to Nodes
+  Step 3: Turn arrays of lexcmds into linked Nodes
+    -> For each node (in the chain), will have to add the start node to
+       the unmatch links
+- Make failNode into an option type instead of making it start node?
