@@ -315,3 +315,137 @@
     -> For each node (in the chain), will have to add the start node to
        the unmatch links
 - Make failNode into an option type instead of making it start node?
+- For the case of many(), successNode points to itself and failNode points
+  to ?
+- When Lexer/Parse DFA/Node stuff is written, see what gets written twice,
+  and try to make it so that it's only written once
+- fn LexCmd -> LexNode
+- fn [LexCmd] -> LexNode could be a map-reduce
+- For non-Many nodes, want success_node to link to the next node. For Many
+  node, want succes_node to link to itself, and fail_node to link to next
+    -> Is this really what we want?
+- I think we have to rethink things, clean them up
+    -> Things are messy now, maybe because of poor planning
+- Should metadata be held in a node?
+    -> Maybe accept states should be own type, and can have metadata field
+    -> Not every node needs a token type, so not every node should have a
+       token type
+- How do we return a token at the end of parsing a token?
+    -> How do we know we're done?
+    -> How do we do this cleanly?
+    -> Formalize accept states?
+- Separate accept state Node type
+    -> cleans up logic and code?
+- Make DFA/Nodes generic, and have constructing logic
+- Make everything immutable/ephemeral (functional)
+- Do we even need a fail node? If we don't match, then what?
+    -> Inital thought: have it be an Option type, or return the start node
+    -> Rethink: Don't need fail node
+- Simple: make it a linked list
+    -> Focus should be making things simple and clean
+    -> Maybe just start with symbol(), and add from there?
+    -> And should think about clearly defined modules from the beginning
+- (?) Let's restart; clean slate
+    -> git?
+    -> so copy everything to a copy, and then modify the original dir
+- Only worry about symbol
+    -> Makes sense: thinking about too many things in inefficient
+    -> think about them on a by-need basis
+    -> Or make a good foundation, and then modify/build that foundation in
+       small steps that are reasoned about appropriately
+    -> They're small, so easy to reason about
+- Do everything with symbol
+    -> DFA/Nodes, Lexer, Parser
+    -> Get something working
+    -> And then worry about adding more stuff, like more commands and cmd
+       modifiers (many1, etc)
+    -> Start with 2 tokens: + and -
+- Think about maps, folds and filters
+- Could make (~[~LexCmd], T) its own type?
+- Learn about lifetimes and ownership so we don't keep getting stuck on this
+  stuff
+- Think about token overlap
+    -> e.g. between '+' and '++'
+    -> either have to do backtracing, or combine them both (into one path)
+    -> But let's stick to simple first, worry about that 0.1 release
+- Make Parst its own github repo
+- Release 0.1 should:
+    -> Have excellent code quality (naming, modules, short functions, etc)
+    -> Be well documented
+    -> Have unit tests
+- Start with minimum base functionality, and work up from there
+- Immutable
+    -> i.e. don't use the 'mut' keyword anywhere
+- Other nodes could try parsing the already parsed string (if there is one),
+  and if they "need" more to parse, get it from the iter
+    -> What happens when input is consumed, but failure is reached?
+    -> What do we do with the consumed input? With the iter?
+- Start with mutable impl and then make it immutable?
+- Is there a way to set an iterator to a certain position?
+- Layer of indirection
+    -> Have a dude pull from the iterator, and put into a list. Also, give
+       that char to the node.
+    -> If the node fails, instead of the dude pulling from the iterator,
+       the dude will pull from the list
+    -> When all chars have been pulled from the list, the dude will pull from
+       the iterator again
+    -> On match, the chars in the array are made into a string, and along
+       with the token type from the match, a token is constructed and
+       put into the token array (the return value from lex)
+    -> If no match, turn array into string to show in error message
+    -> "Failed to tokenize <array contents>"
+- char_getter has methods next(), reset(), make_token()
+    -> reset() resets index into the array
+    -> keeps track of index into array
+    -> grows array (with append())
+- Need to keep track of longest, /Successful/ match (its token + str)
+    -> Keep track of it in DFA?
+    -> DFA will call char_getter.next() and pass it on to Node
+    -> What happens when no more chars?
+- Better name for CharGetter?
+- May have leftover state in CharGettter after parsing a token
+    -> e.g. the longest parsed token could be 5 chars long, but there could
+       have been a token that we parsed 8 chars for, but which failed on the
+       9th
+- Going to have to test the shit out of this
+- It would be awesome if I could make this all immutable and clean
+    -> That's the goal: world class code (can't do world class design)
+    -> Think harder about using map, filter, fold, scan etc.
+- State
+    -> token type + string (What we care about after the 2 folds)
+    -> CharGetter (may need to retain state betweeen 2D folds)
+- (?) Define fold for LexNode/LexDFA?
+- Fold across
+    -> Return either Some(Token<T>) or None, and a CharGetter
+- Fold down
+    -> Return Some(Token<T> with longest str) or None, and a CharGetter
+- Fold down calls the fold acrosses
+    -> Char getters need to be used serially, because there is only one
+       underlying char iter that needs to be used serially
+- CharGetter should be checked for exhuastion before every fold down
+- A few edge cases to test
+    -> CharGetter running out of input during fold across
+    -> etc.
+- Make TokenMake more self-contained
+- Write tests
+- Clean up token_maker.rs
+    -> Better naming, try not to use mutability
+- Let's do skeleton code
+    -> Let's start from the beginning and rethink things
+- Better name: TokenScanner, or just Scanner
+    -> Make BufferedIter its own type/struct?
+    -> Then TokenScanner consists of Option<TokenState> and a BufferedIter
+- BufferedIter is more than just buffered
+    -> we can move/pull from anywhere in the BufferedIter
+- Could use RandomAccessIterator
+    -> Still need to keep track of what has been parsed
+    -> Could allow us to work with strings instead of [char]
+    -> Would it make immutablitiy easier?
+    -> Would only have to store indexes?
+    -> *** RandomAccessIterator reduces state, because we don't have to worry
+       about state modification due to next()
+- How do we make while(!is_exhausted()) into functional/immutable goodness?
+    -> recursion
+- Look at rust src to see how they do doc
+- Can't use RandomAccessIterator because we can't get a RAI from a File, can
+  only get an Iterator<u8>
