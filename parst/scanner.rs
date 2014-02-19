@@ -8,6 +8,7 @@ fn main() {}
 pub struct TokenScanner<T> {
     input: ~Iterator<u8>,
     buf: ~[char],
+    // TODO: better name?
     len: uint, // number of currently parsed chars for the current token
     token: Option<Token<T>>,
     exhausted: bool
@@ -45,6 +46,33 @@ impl<T: Clone> TokenScanner<T> {
         }
     }
 
+    // TODO: doc
+    // Updates len, buf, exhausted
+    pub fn next_char(self) -> (Option<char>, TokenScanner<T>) {
+        if self.len < self.buf.len() {
+            let mut scanner = self;
+            let next = scanner.buf[scanner.len];
+            scanner.len += 1;
+            (Some(next), scanner)
+        } else {
+            let mut scanner = self;
+            let opt_next = scanner.input.next();
+            match opt_next {
+                Some(u) => {
+                    let next = u as char;
+                    scanner.buf.push(next);
+                    scanner.len += 1;
+                    (Some(next), scanner)
+                }
+                None => {
+                    scanner.exhausted = true;
+                    (None, scanner)
+                }
+            }
+        }
+    }
+
+    // TODO: doc
     pub fn reset(self) -> TokenScanner<T> {
         let mut scanner = self;
         scanner.len = 0;

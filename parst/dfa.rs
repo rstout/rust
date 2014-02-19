@@ -25,6 +25,7 @@ impl ToStr for MyToken {
 }
 
 fn main() {
+/*
     let cmds = ~[symbol('p'), symbol('l'), symbol('u'), symbol('s')];
     let node = lex_cmds_to_nodes((cmds, Plus));
     let o = node.parse_token(~['p', 'l', 'u', 's']);
@@ -32,6 +33,7 @@ fn main() {
         Some(tok) => println!("{}", tok.to_str()),
         None => println!("None")
     }
+*/
     //    node.print()
 }
 
@@ -54,17 +56,24 @@ enum LexNode<T> {
 }
 
 impl<T: Clone> LexNode<T> {
+    // TODO: doc
     pub fn tokenize(&self, scanner: TokenScanner<T>) -> TokenScanner<T> {
-        let scanner1 = match self {
-            &Accept(ref t) => {
-                scanner.update_token(t.clone()).reset()
+        match self {
+            &Accept(ref t) => scanner.update_token(t.clone()).reset(),
+            &Trans(ref cmd, ~ref node) => {
+                let (opt_next, scanner2) = scanner.next_char();
+                match opt_next {
+                    Some(next) if cmd.accepts(next) => {
+                        node.tokenize(scanner2)
+                    }
+                    _ => scanner2.reset()
+                }
             }
         }
-
-        // reset index explicitly?
-        scanner1.reset_index()
     }
 
+    // TODO: delete
+    /*
     pub fn parse_token(&self, input: &[char]) -> Option<T> {
         match self {
             &Accept(ref tok) => { Some(tok.clone()) }
@@ -76,6 +85,7 @@ impl<T: Clone> LexNode<T> {
             _ => None
         }
     }
+     */
 }
 
 impl<T> LexNode<T> {

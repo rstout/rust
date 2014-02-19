@@ -449,3 +449,5 @@
 - Look at rust src to see how they do doc
 - Can't use RandomAccessIterator because we can't get a RAI from a File, can
   only get an Iterator<u8>
+- We have an immutable interface that does mutation under the covers
+    -> pretty cool
