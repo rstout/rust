@@ -16,7 +16,7 @@ pub struct TokenScanner<T> {
 // Before creating methods, design DFA arch
 
 impl<T: Clone> TokenScanner<T> {
-
+    // TODO: doc
     fn set_token(self, t: T) -> TokenScanner<T> {
         let s = from_chars(self.buf.slice_to(self.len));
         let token = Token::new(t, s);
@@ -25,12 +25,8 @@ impl<T: Clone> TokenScanner<T> {
         scanner
     }
 
-    fn get_token(self) -> Option<Token<T>> {
-        self.token
-    }
-
+    // TODO: doc
     pub fn update_token(self, t: T) -> TokenScanner<T> {
-    //pub fn update_token(&self, t: T) -> Option<T> {
         // Don't set token if there is a longer token already set
         let token = self.token.clone();
         match token {
@@ -43,9 +39,16 @@ impl<T: Clone> TokenScanner<T> {
                 }
             }
             // Only set a non-zero length token
-            None if self.len > 0 => { self.set_token(t) }
-            _ => { self }
+            // TODO: raise error/exception?
+            None if self.len > 0 => self.set_token(t),
+            _ => self
         }
+    }
+
+    pub fn reset(self) -> TokenScanner<T> {
+        let mut scanner = self;
+        scanner.len = 0;
+        scanner
     }
 }
 

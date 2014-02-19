@@ -57,7 +57,7 @@ impl<T: Clone> LexNode<T> {
     pub fn tokenize(&self, scanner: TokenScanner<T>) -> TokenScanner<T> {
         let scanner1 = match self {
             &Accept(ref t) => {
-                scanner.set_token(t.clone())
+                scanner.update_token(t.clone()).reset()
             }
         }
 
