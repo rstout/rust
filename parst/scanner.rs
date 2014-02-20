@@ -47,6 +47,7 @@ impl<T: Clone> TokenScanner<T> {
     }
 
     // TODO: doc
+    // TODO: maybe breakup into smaller functions?
     // Updates len, buf, exhausted
     pub fn next_char(self) -> (Option<char>, TokenScanner<T>) {
         if self.len < self.buf.len() {
@@ -77,6 +78,11 @@ impl<T: Clone> TokenScanner<T> {
         let mut scanner = self;
         scanner.len = 0;
         scanner
+    }
+
+    // TODO: impl, doc
+    pub fn flush(self) -> TokenScanner<T> {
+        self
     }
 }
 

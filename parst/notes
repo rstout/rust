@@ -451,3 +451,6 @@
   only get an Iterator<u8>
 - We have an immutable interface that does mutation under the covers
     -> pretty cool
+- Remember to do failure
+    -> If none of the branches returned a token, do something
+    -> possibly something with the partially parsed input
