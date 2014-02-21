@@ -59,15 +59,16 @@ impl<T: Clone> LexDFA<T> {
         // Some(new_tok_array).
         // If the resultant TokenScanner is None, if TokenScanner is
         // exhausted return Some([]), else return None
-        //None
         let scanner2 = self.fold_branches(scanner);
-        match scanner2.token {
+        let scanner2_token = scanner2.token.clone();
+        match scanner2_token {
             Some(token) => {
                 // ? Reminder: exhausted check somewhere here
                 let scanner3 = scanner2.flush();
                 match self.lex(scanner3) {
-                    Some(tokens) => {
-                        Some(tokens.push(token))
+                    Some(mut tokens) => {
+                        tokens.push(token);
+                        Some(tokens)
                     }
                     None => None
                 }
@@ -115,21 +116,6 @@ impl<T: Clone> LexNode<T> {
             }
         }
     }
-
-    // TODO: delete
-    /*
-    pub fn parse_token(&self, input: &[char]) -> Option<T> {
-        match self {
-            &Accept(ref tok) => { Some(tok.clone()) }
-            &Trans(ref cmd, ~ref node) if input.len() > 0 => {
-                if cmd.accepts(*input.head()) {
-                    node.parse_token(input.tail())
-                } else { None }
-            }
-            _ => None
-        }
-    }
-     */
 }
 
 impl<T> LexNode<T> {
@@ -148,3 +134,12 @@ fn lex_cmds_to_nodes<T>((cmds, tok): (~[LexCmd], T)) -> ~LexNode<T> {
 }
 
 // TODO: test lex_cmds_to_nodes
+
+// Test template
+#[cfg(test)]
+mod test {
+    #[test]
+    fn test_fn() {
+
+    }
+}
