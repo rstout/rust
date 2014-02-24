@@ -454,3 +454,10 @@
 - Remember to do failure
     -> If none of the branches returned a token, do something
     -> possibly something with the partially parsed input
+- Why not use byte iterator instead of Iterator?
+    -> Can file::ByteIterator even be cast to an Iterator?
+    -> Don't need an iterator, just something that implements next()
+    -> Maybe Iterator<T>, where T could be u8 or &u8?
+- Can fn(char) be given a &char?
+- test overloading
+    -> Not the way we want to go though

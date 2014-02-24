@@ -35,6 +35,7 @@ fn main() {
     }
 */
     //    node.print()
+    let u = 8u8;
 }
 
 struct LexDFA<T> {
@@ -45,7 +46,16 @@ struct LexDFA<T> {
 // TODO: better names than scanner2?
 impl<T: Clone> LexDFA<T> {
     // Creates a new TokenScanner and calls lex
-    // fn run(&self, ~Iterator<u8>) -> Option<~[Token<T>]> {}
+    /*
+    fn run(&self, input: ~Iterator<u8>) -> Option<~[Token<T>]> {
+        let scanner: TokenScanner<T> = TokenScanner::new(input);
+        let opt_tokens = self.lex(scanner);
+        match opt_tokens {
+            Some(tokens) => Some(tokens.reverse()),
+            None => None
+        }
+    }
+     */
 
     // TODO: doc
     // TODO: note that if the char stream is not completely successfully
