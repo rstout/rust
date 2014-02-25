@@ -461,3 +461,8 @@
 - Can fn(char) be given a &char?
 - test overloading
     -> Not the way we want to go though
+- Let's go with an object that implements next
+    - Could call it trait Input
+- Parser needs to keep track of Position
+    -> So maybe Token<T> has pos_start and pos_end fields
+    -> or pos: (int, int)

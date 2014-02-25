@@ -4,10 +4,16 @@ mod token;
 
 fn main() {}
 
+// TODO: Explain why this exists
+trait Input<T> {
+    fn next(&self) -> Option<T>;
+}
+
 // TODO: doc
-// Really a BufferedReader
+// Really a BufferedReader with custom state
 pub struct TokenScanner<T> {
-    input: ~Iterator<u8>,
+    //input: ~Iterator<u8>,
+    input: ~Input<u8>,
     buf: ~[char],
     // TODO: better name?
     len: uint, // number of currently parsed chars for the current token
@@ -18,7 +24,7 @@ pub struct TokenScanner<T> {
 // Before creating methods, design DFA arch
 
 impl<T: Clone> TokenScanner<T> {
-    pub fn new(input: ~Iterator<u8>) -> TokenScanner<T> {
+    pub fn new(input: ~Input<u8>) -> TokenScanner<T> {
         TokenScanner {
             input: input,
             buf: ~[],
@@ -107,6 +113,7 @@ mod test {
     //use std::vec::VecIterator;
     use std::io::BufReader;
     use std::io::extensions::Bytes;
+    use std::gc::Gc;
     // ByteIterator has a lifetime.
     // Send things cannot contain borrowed pointers that are not 'static
     // there's no way to fix it, that code isn't safe. You'd be returning
@@ -133,9 +140,18 @@ mod test {
     //fn f(c: char) {}
     //fn f(c: &char) {}
 */
+    // Use RefCell<Gc<>>?
     fn f<'a>(byte_iter: &'a Bytes<BufReader>) -> &'a Iterator<u8> {
         byte_iter as &'a Iterator<u8>
     }
+
+/*
+    fn g<'a>(buf_reader: &'a BufReader) -> &'a Bytes<BufReader> {
+        let byte_iter: &'a Bytes<BufReader> = &'a Bytes::new(buf_reader);
+        //byte_iter as &'a Iterator<u8>
+        byte_iter
+    }
+*/
 
     #[test]
     fn test_reset_sets_len_to_zero() {
